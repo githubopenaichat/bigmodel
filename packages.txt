@@ -5,3 +5,5 @@ pip isntall accelerate
 pip install tensorboard
 pip install tqdm
 pip install wandb
+nvidia-smi
+pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124
