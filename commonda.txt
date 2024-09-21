@@ -1,1 +1,6 @@
+tar -xvf /root/public/scripts/scripts.tgz -C /
+network-turbo init "http://hgh1p.dc.houdeyun.cn:65082"
+source network-turbo && proxy_set
 
+
+https://help.houdeyun.cn/shiyongjiaocheng/b410
