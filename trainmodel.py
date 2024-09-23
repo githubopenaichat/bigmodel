@@ -35,6 +35,7 @@ config = {"train_batch_size": 2, # 12
           "max_eval_steps": -1,
           "seq_length": 1024,
           "seed": 1,
+          "num_epochs": 10,
           "save_checkpoint_steps": 50000} # 15000
 
 args = Namespace(**config)
@@ -123,29 +124,66 @@ model, optimizer, train_dataloader, eval_dataloader = accelerator.prepare(model,
 #    return forward_call(*args, **kwargs)
 #TypeError: GPT2Model.forward() got an unexpected keyword argument 'labels'
 
+for epoch in range(num_epochs):  
+    model.train()  # Set the model to training mode  
+    for step, batch in enumerate(train_dataloader, start=1):  
+        # Move the batch to the appropriate device (GPU/TPU)  
+        batch = {k: v.to(accelerator.device) for k, v in batch.items()}  
+        
+        # Zero the gradients  
+        optimizer.zero_grad()  
 
+        # Forward pass  
+        outputs = model(**batch)  
+        loss = outputs.loss  # Assume your model outputs the loss  
 
-completed_steps = 0
-for step, batch in enumerate(train_dataloader, start=1):
-    loss = model(batch, labels=batch).loss
-    log_metrics(step, {'lr': get_lr(), 'samples': step*samples_per_step,
-                       'steps': completed_steps, 'loss/train': loss.item()})
-    loss = loss / args.gradient_accumulation_steps
-    accelerator.backward(loss)
-    if step % args.gradient_accumulation_steps == 0:
-        optimizer.step()
-        lr_scheduler.step()
-        optimizer.zero_grad()
-        completed_steps += 1
-    if step % args.save_checkpoint_steps == 0:
-        logger.info('Evaluating and saving model checkpoint')
-        eval_loss, perplexity = evaluate()
-        log_metrics(step, {'loss/eval': eval_loss, 'perplexity': perplexity})
-        accelerator.wait_for_everyone()
-        unwrapped_model = accelerator.unwrap_model(model)
-        if accelerator.is_main_process:
-            unwrapped_model.save_pretrained("./")
-            hf_repo.push_to_hub(commit_message=f'step {step}')
-        model.train()
-    if completed_steps >= args.max_train_steps:
-        break
+        # Backward pass  
+        accelerator.backward(loss)  
+
+        # Update the parameters  
+        optimizer.step()  
+
+        completed_steps += 1  
+        
+        if step % args.logging_steps == 0:  # Assuming `args.logging_steps` is defined  
+            print(f"Epoch: {epoch}, Step: {step}, Loss: {loss.item()}")  
+
+    # Optional evaluation at the end of each epoch  
+    if eval_dataloader is not None:  
+        model.eval()  # Set the model to evaluation mode  
+        total_eval_loss = 0  
+        with torch.no_grad():  
+            for eval_step, eval_batch in enumerate(eval_dataloader):  
+                eval_batch = {k: v.to(accelerator.device) for k, v in eval_batch.items()}  
+                eval_outputs = model(**eval_batch)  
+                total_eval_loss += eval_outputs.loss.item()  
+
+        avg_eval_loss = total_eval_loss / len(eval_dataloader)  
+        print(f"Epoch: {epoch} - Average Evaluation Loss: {avg_eval_loss}")  
+
+print("Training complete!")
+
+#completed_steps = 0
+#for step, batch in enumerate(train_dataloader, start=1):
+#    loss = model(batch, labels=batch).loss
+#    log_metrics(step, {'lr': get_lr(), 'samples': step*samples_per_step,
+#                       'steps': completed_steps, 'loss/train': loss.item()})
+#    loss = loss / args.gradient_accumulation_steps
+#    accelerator.backward(loss)
+#    if step % args.gradient_accumulation_steps == 0:
+#        optimizer.step()
+#        lr_scheduler.step()
+#        optimizer.zero_grad()
+#        completed_steps += 1
+#    if step % args.save_checkpoint_steps == 0:
+#        logger.info('Evaluating and saving model checkpoint')
+#        eval_loss, perplexity = evaluate()
+#        log_metrics(step, {'loss/eval': eval_loss, 'perplexity': perplexity})
+#        accelerator.wait_for_everyone()
+#        unwrapped_model = accelerator.unwrap_model(model)
+#        if accelerator.is_main_process:
+#            unwrapped_model.save_pretrained("./")
+#            hf_repo.push_to_hub(commit_message=f'step {step}')
+#        model.train()
+#    if completed_steps >= args.max_train_steps:
+#        break
