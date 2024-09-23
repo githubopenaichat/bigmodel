@@ -1,12 +1,18 @@
 from transformers import AutoConfig, AutoModelForCausalLM, AutoTokenizer
 
+org = "transformersbook"
+model_ckpt = "codeparrot"
 
-tokenizer = AutoTokenizer.from_pretrained(model_ckpt)
-config_small = AutoConfig.from_pretrained("gpt2", vocab_size=len(tokenizer))
-model_small = AutoModelForCausalLM.from_config(config_small)
-
-model_small.save_pretrained("models/" + model_ckpt + "-small", push_to_hub=True, organization=org)
+tokenizer_ = AutoTokenizer.from_pretrained(org+"/"+model_ckpt)
+config_small = AutoConfig.from_pretrained("gpt2-xl", vocab_size=len(tokenizer))
+model_small_ = AutoModelForCausalLM.from_config(config_small)
 
 # 保存模型  
-model.save_pretrained("./codeparrot_trained_model")  
-tokenizer.save_pretrained("./codeparrot_trained_model")
+model_small_.save_pretrained("/root/data/models/codeparrot_trained_model")  
+tokenizer_.save_pretrained("/root/data/models/codeparrot_trained_model")
+
+
+tokenizer = AutoTokenizer.from_pretrained(/root/data/models/codeparrot_trained_model)  
+model = AutoModel.from_pretrained(/root/data/models/codeparrot_trained_model)  
+
+
