@@ -20,7 +20,7 @@ org = "transformersbook"
 model_ckpt = "codeparrot"
 
 tokenizer_ = AutoTokenizer.from_pretrained(org+"/"+model_ckpt)
-config_small = AutoConfig.from_pretrained("gpt2-xl", vocab_size=len(tokenizer_))
+config_small = AutoConfig.from_pretrained("gpt2", vocab_size=len(tokenizer_))
 model_small_ = AutoModelForCausalLM.from_config(config_small)
 
 config = {"train_batch_size": 2, # 12
@@ -94,7 +94,7 @@ def get_grouped_params(model, no_decay=["bias", "LayerNorm.weight"]):
             params_with_wd.append(p)
     return [{'params': params_with_wd, 'weight_decay': args.weight_decay},
             {'params': params_without_wd, 'weight_decay': 0.0}]
-            
+
 def create_dataloaders(dataset_name):
     train_data = load_dataset(dataset_name+'-train', split="train", streaming=True)
     train_data = train_data.shuffle(buffer_size=args.shuffle_buffer, seed=args.seed)
