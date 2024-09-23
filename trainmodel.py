@@ -113,6 +113,18 @@ optimizer = AdamW(get_grouped_params(model), lr=args.learning_rate)
 train_dataloader, eval_dataloader = create_dataloaders(dataset_name)
 model, optimizer, train_dataloader, eval_dataloader = accelerator.prepare(model, optimizer, train_dataloader, eval_dataloader)
 
+#Token indices sequence length is longer than the specified maximum sequence length for this model (2626 > 1024). Running this sequence through the model will result in indexing errors
+#Traceback (most recent call last):
+#  File "/root/data/bigmodel/train.py", line 118, in <module>
+#    loss = model(batch, labels=batch).loss
+#  File "/opt/miniconda/envs/MiniCPMV/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1553, in _wrapped_call_impl
+#    return self._call_impl(*args, **kwargs)
+#  File "/opt/miniconda/envs/MiniCPMV/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1562, in _call_impl
+#    return forward_call(*args, **kwargs)
+#TypeError: GPT2Model.forward() got an unexpected keyword argument 'labels'
+
+
+
 completed_steps = 0
 for step, batch in enumerate(train_dataloader, start=1):
     loss = model(batch, labels=batch).loss
