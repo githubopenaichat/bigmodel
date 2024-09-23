@@ -8,12 +8,12 @@ config_small = AutoConfig.from_pretrained("gpt2-xl", vocab_size=len(tokenizer))
 model_small_ = AutoModelForCausalLM.from_config(config_small)
 
 # 保存模型  
-model_small_.save_pretrained("/root/data/models/codeparrot_trained_model")
-tokenizer_.save_pretrained("/root/data/models/codeparrot_trained_model")
+model_small_.save_pretrained("/root/data/bigmodel/models/codeparrot-small")
+tokenizer_.save_pretrained("/root/data/bigmodel/models/codeparrot-small")
 
 
-tokenizer = AutoTokenizer.from_pretrained(/root/data/models/codeparrot_trained_model)
-model = AutoModel.from_pretrained(/root/data/models/codeparrot_trained_model)
+tokenizer = AutoTokenizer.from_pretrained("/root/data/bigmodel/models/codeparrot-small")
+model = AutoModel.from_pretrained("/root/data/bigmodel/models/codeparrot-small")
 
 def create_dataloaders(dataset_name):
     train_data = load_dataset(dataset_name+'-train', split="train", streaming=True)
