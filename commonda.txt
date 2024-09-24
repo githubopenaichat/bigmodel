@@ -8,3 +8,5 @@ https://help.houdeyun.cn/shiyongjiaocheng/b410
 sudo apt update
 sudo apt install git
 git --version
+
+sudo git lfs install 
