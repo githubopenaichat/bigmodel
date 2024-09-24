@@ -3,7 +3,7 @@ import os
 import time
 from argparse import Namespace
 from pathlib import Path
-
+from huggingface_hub import login, Repository
 import datasets
 import torch
 from accelerate import Accelerator, DistributedType
@@ -16,9 +16,22 @@ from torch.utils.data import IterableDataset
 from torch.utils.data.dataloader import DataLoader
 from torch.utils.data.datapipes.iter.combinatorics import ShufflerIterDataPipe
 
-import transformers
-from transformers import AutoModelForCausalLM, AutoTokenizer, HfArgumentParser, get_scheduler, set_seed
 
+import transformers
+from transformers import AutoModelForCausalLM, AutoTokenizer, HfArgumentParser, get_scheduler, set_seed, AutoConfig
+
+token = "hf_fEhwaGyNMUjvdcqBzkynmxjKgT"
+login(token)
+
+org = "transformersbook"
+model_ckpt = "codeparrot"
+
+# tokenizer_ = AutoTokenizer.from_pretrained(org+"/"+model_ckpt)
+# config_small = AutoConfig.from_pretrained("gpt2", vocab_size=len(tokenizer_))
+# model_small_ = AutoModelForCausalLM.from_config(config_small)
+
+# model_small_.save_pretrained("/root/data/bigmodel/models/codeparrot-small")
+# tokenizer_.save_pretrained("/root/data/bigmodel/models/codeparrot-small")
 
 class ConstantLengthDataset(IterableDataset):
     """
