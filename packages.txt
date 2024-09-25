@@ -1,7 +1,7 @@
 pip install datasets
 pip install transformers
 pip install torch
-pip isntall accelerate
+pip install accelerate
 pip install tensorboard
 pip install tqdm
 pip install wandb
