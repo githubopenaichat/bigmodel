@@ -9,4 +9,4 @@ sudo apt update
 sudo apt install git
 git --version
 
-sudo git lfs install 
+sudo apt-get install git
